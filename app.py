@@ -1,10 +1,21 @@
 import streamlit as st
+import subprocess
 import os
+
+# 1. Instalación inmediata de Playwright
+@st.cache_resource
+def install_playwright():
+    # Usamos el comando simple que funciona en el otro código
+    subprocess.run(["playwright", "install", "chromium"])
+
+install_playwright()
+
+# Ahora sí, el resto de imports
 import asyncio
 from playwright.async_api import async_playwright
 import datetime
-import json
 import base64
+import json
 from io import BytesIO
 
 # Librerías para generación de Excel Técnico
@@ -897,22 +908,12 @@ async def generate_pdf(html_content, output_path):
             headless=True,
             args=[
                 "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--font-render-hinting=none"
+                "--disable-dev-shm-usage"
             ]
         )
-        page = await browser.new_page(viewport={"width": 1240, "height": 1754})
-        await page.emulate_media(media="screen")
-        await page.set_content(html_content, wait_until="load")
-        await page.wait_for_load_state("networkidle")
-        await page.evaluate("() => document.fonts.ready.then(() => true)")
-        await page.pdf(
-            path=output_path,
-            format="A4",
-            print_background=True,
-            prefer_css_page_size=True,
-            margin={"top": "10mm", "right": "8mm", "bottom": "10mm", "left": "8mm"}
-        )
+        page = await browser.new_page()
+        await page.set_content(html_content, wait_until="networkidle")
+        await page.pdf(path=output_path, format="A4", print_background=True)
         await browser.close()
 
 # --- COMPILACIÓN ---
