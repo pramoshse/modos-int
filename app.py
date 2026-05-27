@@ -24,6 +24,15 @@ def install_playwright_chromium():
 
 install_playwright_chromium()
 
+import sys
+import os
+st.write(f"Versión de Python detectada: {sys.version}")
+if os.path.exists("runtime.txt"):
+    with open("runtime.txt", "r") as f:
+        st.write(f"Contenido de runtime.txt: {f.read()}")
+else:
+    st.error("⚠️ No se encuentra el archivo runtime.txt en la raíz")
+
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Piloto HEC v0", layout="wide", initial_sidebar_state="collapsed")
 
