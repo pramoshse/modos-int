@@ -19,3 +19,4 @@ libx11-xcb1
 libxcb1
 libxext6
 libxshmfence1
+libgtk-3-0
