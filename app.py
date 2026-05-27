@@ -293,6 +293,11 @@ opciones_tareas = {
 col1, col2 = st.columns(2)
 
 with col1:
+    st.markdown('<div class="custom-section-header">Información del Documento</div>', unsafe_allow_html=True)
+    codigo_documento = st.text_input("Código", key="codigo_documento")
+    revision_documento = st.text_input("Revisión", key="revision_documento")
+    fecha_documento = st.date_input("Fecha", value=datetime.date.today(), key="fecha_documento")
+
     st.markdown('<div class="custom-section-header">Información de Sitio</div>', unsafe_allow_html=True)
     lista_sitios = [
         "Planta Tucumán", "Planta Formosa", "Planta Salta",
@@ -704,6 +709,11 @@ with col_aud2:
     if msg_final:
         st.markdown(f'<div style="color: {color_fin}; font-weight: bold; border: 2px solid {color_fin}; padding: 15px; border-radius: 5px; text-align: center;">Instrucción Final: {msg_final}</div>', unsafe_allow_html=True)
 
+    st.markdown('<div style="margin-top: 25px;"></div>', unsafe_allow_html=True)
+    aprobador = st.text_input("Aprobador", key="aprobador")
+    puesto_aprobador = st.text_input("Puesto del Aprobador", key="puesto_aprobador")
+    fecha_aprobacion = st.date_input("Fecha de Aprobación", value=datetime.date.today(), key="fecha_aprobacion")
+
 
 # --- SIDEBAR: DESCARGA DE BORRADOR JSON ---
 with st.sidebar:
@@ -774,9 +784,9 @@ HTML_TEMPLATE = """
             </td>
             <td class="header-info">
                 <table>
-                    <tr><td><strong>CÓDIGO:</strong></td><td></td></tr>
-                    <tr><td><strong>REVISIÓN:</strong></td><td></td></tr>
-                    <tr><td><strong>FECHA:</strong></td><td>__FECHA_ACTUAL__</td></tr>
+                    <tr><td><strong>CÓDIGO:</strong></td><td>__CODIGO_DOCUMENTO__</td></tr>
+                    <tr><td><strong>REVISIÓN:</strong></td><td>__REVISION_DOCUMENTO__</td></tr>
+                    <tr><td><strong>FECHA:</strong></td><td>__FECHA_DOCUMENTO__</td></tr>
                 </table>
             </td>
         </tr>
@@ -884,8 +894,7 @@ HTML_TEMPLATE = """
                 </td>
                 <td style="width: 50%; border: 1px solid #cbd5e1; padding: 15px; vertical-align: top;">
                     <strong>Aprobó:</strong><br><br>
-                    <div style="border-bottom: 1px solid black; width: 80%; margin-top: 20px;"></div>
-                    <div style="font-size: 8pt; margin-top: 5px;">Firma y Aclaración</div>
+                    __APROBADOR_FULL__
                 </td>
             </tr>
         </table>
@@ -952,7 +961,10 @@ if st.button("✅ COMPILAR REPORTE (PDF, Word y Excel)"):
             
             html_f = HTML_TEMPLATE
             html_f = html_f.replace("__LOGO_HTML__", logo_tag).replace("__FOTO_EQUIPO__", equip_tag).replace("__ARBOL_LOTO__", arbol_tag)
-            html_f = html_f.replace("__PLANTA__", sitio).replace("__FECHA_ACTUAL__", datetime.datetime.now().strftime("%d/%m/%Y"))
+            html_f = html_f.replace("__PLANTA__", sitio)
+            html_f = html_f.replace("__CODIGO_DOCUMENTO__", codigo_documento)
+            html_f = html_f.replace("__REVISION_DOCUMENTO__", revision_documento)
+            html_f = html_f.replace("__FECHA_DOCUMENTO__", fecha_documento.strftime("%d/%m/%Y"))
             html_f = html_f.replace("__NEGOCIO__", negocio).replace("__TIPO_SITIO__", tipo_sitio)
             html_f = html_f.replace("__AREA__", area_sector).replace("__LINEA__", linea)
             
@@ -1011,7 +1023,8 @@ if st.button("✅ COMPILAR REPORTE (PDF, Word y Excel)"):
             html_f = html_f.replace("__ENERGIA__", energia_txt)
             
             evaluador_full = f"{evaluador} - {puesto_evaluador} - {fecha_evaluacion.strftime('%d/%m/%Y')}"
-            html_f = html_f.replace("__EVALUADOR_FULL__", evaluador_full).replace("__FILAS_MATRIZ__", html_rows)
+            aprobador_full = f"{aprobador} - {puesto_aprobador} - {fecha_aprobacion.strftime('%d/%m/%Y')}"
+            html_f = html_f.replace("__EVALUADOR_FULL__", evaluador_full).replace("__APROBADOR_FULL__", aprobador_full).replace("__FILAS_MATRIZ__", html_rows)
             html_f = html_f.replace("__CONCLUSIONES__", medidas_conclusiones).replace("__MODO_FINAL__", modo_final.upper())
             html_f = html_f.replace("__COLOR_FINAL__", colores_modos.get(modo_final, "#B51E2D"))
             
@@ -1194,9 +1207,9 @@ if st.button("✅ COMPILAR REPORTE (PDF, Word y Excel)"):
             _merge("C1:H2", "CONTROL DE ENERGÍAS PELIGROSAS", fill=black_fill, font=white_font_big, border=black_border, alignment=Alignment(horizontal="center", vertical="center", wrap_text=True))
             _merge("C3:H3", f"{negocio} - {sitio}", fill=black_fill, font=white_font, border=black_border, alignment=Alignment(horizontal="center", vertical="center", wrap_text=True))
             _merge("C4:H4", "MODOS DE INTERVENCIÓN Y EVALUACIÓN DE RIESGOS", fill=dark_fill, font=white_font_mid, border=black_border, alignment=Alignment(horizontal="center", vertical="center", wrap_text=True))
-            _merge("I1:J1", "CÓDIGO:", fill=gray_fill, font=small_bold_font, border=black_border, alignment=Alignment(horizontal="left", vertical="center"))
-            _merge("I2:J2", "REVISIÓN:", fill=gray_fill, font=small_bold_font, border=black_border, alignment=Alignment(horizontal="left", vertical="center"))
-            _merge("I3:J4", f"FECHA: {datetime.datetime.now().strftime('%d/%m/%Y')}", fill=gray_fill, font=small_bold_font, border=black_border, alignment=Alignment(horizontal="left", vertical="center"))
+            _merge("I1:J1", f"CÓDIGO: {codigo_documento}", fill=gray_fill, font=small_bold_font, border=black_border, alignment=Alignment(horizontal="left", vertical="center"))
+            _merge("I2:J2", f"REVISIÓN: {revision_documento}", fill=gray_fill, font=small_bold_font, border=black_border, alignment=Alignment(horizontal="left", vertical="center"))
+            _merge("I3:J4", f"FECHA: {fecha_documento.strftime('%d/%m/%Y')}", fill=gray_fill, font=small_bold_font, border=black_border, alignment=Alignment(horizontal="left", vertical="center"))
 
             # Fila técnica de separación, igual al margen visual del PDF.
             ws.row_dimensions[5].height = 8
@@ -1335,7 +1348,7 @@ if st.button("✅ COMPILAR REPORTE (PDF, Word y Excel)"):
                 concl_number = "5"
 
             # ------------------------------------------------------------------
-            # 7. Conclusiones, banner final y firmas, igual que el PDF.
+            # 7. Conclusiones, banner final y aprobación, igual que el PDF.
             # ------------------------------------------------------------------
             _section_header(f"{concl_number}. Conclusiones / Observaciones")
             conclusiones_text = (
@@ -1361,7 +1374,7 @@ if st.button("✅ COMPILAR REPORTE (PDF, Word y Excel)"):
             ws.row_dimensions[ws.max_row + 1].height = 10
             firma_row = ws.max_row + 2
             _merge(f"A{firma_row}:E{firma_row + 2}", f"Evaluó:\n\n{evaluador_full}", fill=white_fill, font=body_font, border=grid_border, alignment=Alignment(horizontal="left", vertical="top", wrap_text=True))
-            _merge(f"F{firma_row}:J{firma_row + 2}", "Aprobó:\n\n______________________________\nFirma y Aclaración", fill=white_fill, font=body_font, border=grid_border, alignment=Alignment(horizontal="left", vertical="top", wrap_text=True))
+            _merge(f"F{firma_row}:J{firma_row + 2}", f"Aprobó:\n\n{aprobador_full}", fill=white_fill, font=body_font, border=grid_border, alignment=Alignment(horizontal="left", vertical="top", wrap_text=True))
             for r in range(firma_row, firma_row + 3):
                 ws.row_dimensions[r].height = 28
 
@@ -1652,9 +1665,9 @@ if st.button("✅ COMPILAR REPORTE (PDF, Word y Excel)"):
             info_cell = header_table.cell(0, 2)
             _set_cell_shading(info_cell, "EEEEEE")
             _clear_cell(info_cell)
-            _add_label_line(info_cell, "CÓDIGO: ", "", first=True)
-            _add_label_line(info_cell, "REVISIÓN: ", "")
-            _add_label_line(info_cell, "FECHA: ", datetime.datetime.now().strftime("%d/%m/%Y"))
+            _add_label_line(info_cell, "CÓDIGO: ", codigo_documento, first=True)
+            _add_label_line(info_cell, "REVISIÓN: ", revision_documento)
+            _add_label_line(info_cell, "FECHA: ", fecha_documento.strftime("%d/%m/%Y"))
             _add_spacing(5)
 
             # ------------------------------------------------------------------
@@ -1838,7 +1851,7 @@ if st.button("✅ COMPILAR REPORTE (PDF, Word y Excel)"):
                 concl_number_word = "5"
 
             # ------------------------------------------------------------------
-            # 6. Conclusión, banner final y firmas.
+            # 6. Conclusión, banner final y aprobación.
             # ------------------------------------------------------------------
             _section_header(f"{concl_number_word}. Conclusiones / Observaciones")
             concl_table, concl_cell = _single_box()
@@ -1882,7 +1895,7 @@ if st.button("✅ COMPILAR REPORTE (PDF, Word y Excel)"):
             firma_left = firma_table.cell(0, 0)
             firma_right = firma_table.cell(0, 1)
             _write_text(firma_left, f"Evaluó:\n\n{evaluador_full}", color=WORD_TEXT, size=8.5, align=WD_ALIGN_PARAGRAPH.LEFT)
-            _write_text(firma_right, "Aprobó:\n\n______________________________\nFirma y Aclaración", color=WORD_TEXT, size=8.5, align=WD_ALIGN_PARAGRAPH.LEFT)
+            _write_text(firma_right, f"Aprobó:\n\n{aprobador_full}", color=WORD_TEXT, size=8.5, align=WD_ALIGN_PARAGRAPH.LEFT)
 
             word_out = f"Ficha_LOTO_Integral_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.docx"
             doc.save(word_out)
