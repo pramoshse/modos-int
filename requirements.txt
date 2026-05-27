@@ -1,0 +1,6 @@
+streamlit
+playwright
+pillow
+openpyxl
+asyncio
+python-docx
